@@ -11,9 +11,11 @@
 <div>
     <h3>{{ event.title }}</h3>
 
-    <a href="{{ event.link }}" target="_blank">
-        Open Event
-    </a>
+    <a href="{{ event.link }}" target="_blank">Open Event</a>
+
+    <form method="post" action="/events/{{ event.id }}/approve">
+        <button type="submit">Approve</button>
+    </form>
 
     <hr>
 </div>

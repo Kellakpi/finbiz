@@ -1,6 +1,7 @@
 import sqlite3
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
@@ -63,7 +64,7 @@ def get_events():
 
     return events
 
-@app.put("/events/{event_id}/approve")
+@app.post("/events/{event_id}/approve")
 def approve_event(event_id: int):
     connection = sqlite3.connect("finbiz.db")
     cursor = connection.cursor()
@@ -76,7 +77,7 @@ def approve_event(event_id: int):
     connection.commit()
     connection.close()
 
-    return {"message": f"Event {event_id} approved"}
+    return RedirectResponse(url="/", status_code=303)
 
 @app.get("/approved-events")
 def approved_events():

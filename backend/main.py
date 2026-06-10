@@ -14,7 +14,7 @@ def home(request: Request):
     cursor = connection.cursor()
 
     cursor.execute("""
-        SELECT id, title, link
+        SELECT id, title, link, description
         FROM events
         WHERE approved = 0
     """)
@@ -29,7 +29,8 @@ def home(request: Request):
         events.append({
             "id": row[0],
             "title": row[1],
-            "link": row[2]
+            "link": row[2],
+            "description": row[3]
         })
 
     return templates.TemplateResponse(
@@ -103,3 +104,37 @@ def approved_events():
         }
         for row in rows
     ]
+
+@app.get("/approved")
+def approved_page(request: Request):
+
+    connection = sqlite3.connect("finbiz.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT id, title, link, description
+        FROM events
+        WHERE approved = 0
+    """)
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    events = []
+
+    for row in rows:
+       events.append({
+        "id": row[0],
+        "title": row[1],
+        "link": row[2],
+        "description": row[3]
+    })
+
+    return templates.TemplateResponse(
+        request=request,
+        name="approved.html",
+        context={
+            "events": events
+        }
+    )

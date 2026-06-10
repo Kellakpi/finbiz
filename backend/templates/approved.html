@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Approved Events</title>
+</head>
+<body>
+
+<h1>Approved Events</h1>
+
+<a href="/">Back to Pending</a>
+
+<hr>
+
+{% for event in events %}
+<div>
+    <h3>{{ event.title }}</h3>
+
+    <a href="{{ event.link }}" target="_blank">
+        Open Event
+    </a>
+
+    <hr>
+</div>
+{% endfor %}
+
+</body>
+</html>

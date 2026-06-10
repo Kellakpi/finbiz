@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FinBiz</title>
+</head>
+<body>
+
+<h1>Pending Events</h1>
+
+{% for event in events %}
+<div>
+    <h3>{{ event.title }}</h3>
+
+    <a href="{{ event.link }}" target="_blank">
+        Open Event
+    </a>
+
+    <hr>
+</div>
+{% endfor %}
+
+</body>
+</html>

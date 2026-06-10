@@ -1,11 +1,43 @@
 import sqlite3
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="backend/templates")
+
 @app.get("/")
-def home():
-    return {"message": "FinBiz API is running"}
+def home(request: Request):
+
+    connection = sqlite3.connect("finbiz.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT id, title, link
+        FROM events
+        WHERE approved = 0
+    """)
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    events = []
+
+    for row in rows:
+        events.append({
+            "id": row[0],
+            "title": row[1],
+            "link": row[2]
+        })
+
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "events": events
+        }
+    )
 
 
 @app.get("/events")

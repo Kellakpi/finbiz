@@ -14,6 +14,8 @@
 {% for event in events %}
 <div>
     <h3>{{ event.title }}</h3>
+    <img src="https://www.eventbrite.com{{ event.image_url }}" width="300">
+    <p>{{ event.description }}</p>
 
     <a href="{{ event.link }}" target="_blank">
         Open Event

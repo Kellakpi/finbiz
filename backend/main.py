@@ -14,7 +14,7 @@ def home(request: Request):
     cursor = connection.cursor()
 
     cursor.execute("""
-        SELECT id, title, link, description
+        SELECT id, title, link, description, image_url
         FROM events
         WHERE approved = 0
     """)
@@ -30,7 +30,8 @@ def home(request: Request):
             "id": row[0],
             "title": row[1],
             "link": row[2],
-            "description": row[3]
+            "description": row[3],
+            "image_url": row[4]
         })
 
     return templates.TemplateResponse(
@@ -112,9 +113,9 @@ def approved_page(request: Request):
     cursor = connection.cursor()
 
     cursor.execute("""
-        SELECT id, title, link, description
+        SELECT id, title, link, description, image_url
         FROM events
-        WHERE approved = 0
+        WHERE approved = 1
     """)
 
     rows = cursor.fetchall()
@@ -128,7 +129,8 @@ def approved_page(request: Request):
         "id": row[0],
         "title": row[1],
         "link": row[2],
-        "description": row[3]
+        "description": row[3],
+        "image_url": row[4]
     })
 
     return templates.TemplateResponse(
@@ -136,5 +138,42 @@ def approved_page(request: Request):
         name="approved.html",
         context={
             "events": events
+        }
+    )
+
+from backend.post_generator import generate_post
+
+@app.get("/events/{event_id}/preview")
+def preview_event(request: Request, event_id: int):
+
+    connection = sqlite3.connect("finbiz.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT title, description, link
+        FROM events
+        WHERE id = ?
+    """, (event_id,))
+
+    row = cursor.fetchone()
+
+    connection.close()
+
+    if not row:
+        return {"error": "Event not found"}
+
+    post = generate_post(
+        row[0],
+        row[1],
+        row[2]
+    )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="preview.html",
+        context={
+            "title": row[0],
+            "post": post,
+            "link": row[2]
         }
     )

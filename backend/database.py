@@ -2,6 +2,7 @@ import sqlite3
 
 DB_NAME = "finbiz.db"
 
+# Create the events table if it does not already exist
 def create_table():
     connection = sqlite3.connect(DB_NAME)
     cursor = connection.cursor()
@@ -24,6 +25,7 @@ def create_table():
     connection.close()
 
 
+# Save a newly discovered event to the database
 def save_event(title, link, source, description=None, image_url=None, event_date=None, event_location=None):
     connection = sqlite3.connect(DB_NAME)
     cursor = connection.cursor()
@@ -39,6 +41,7 @@ def save_event(title, link, source, description=None, image_url=None, event_date
         connection.commit()
         print(f"Saved: {title}")
 
+    # Prevent duplicate events from being added
     except sqlite3.IntegrityError:
         print(f"Already exists: {title}")
 

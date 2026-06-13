@@ -7,10 +7,15 @@
 
 <h1>Pending Events</h1>
 
+<!-- Display all events waiting for approval -->
 {% for event in events %}
 <div>
     <h3>{{ event.title }}</h3>
+    <p>📅 {{ event.event_date }}</p>
+    <p>📍 {{ event.event_location }}</p>
+
     <img src="https://www.eventbrite.com{{ event.image_url }}" width="300">
+
     <p>{{ event.description }}</p>
 
     <a href="{{ event.link }}" target="_blank">
@@ -21,6 +26,7 @@
         Preview Post
     </a>
 
+    <!-- Approve event and move it to the approved dashboard -->
     <form method="post" action="/events/{{ event.id }}/approve">
         <button type="submit">Approve</button>
     </form>

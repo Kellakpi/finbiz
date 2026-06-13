@@ -7,6 +7,7 @@ app = FastAPI()
 
 templates = Jinja2Templates(directory="backend/templates")
 
+# Display all pending events waiting for approval
 @app.get("/")
 def home(request: Request):
 
@@ -14,7 +15,7 @@ def home(request: Request):
     cursor = connection.cursor()
 
     cursor.execute("""
-        SELECT id, title, link, description, image_url
+        SELECT id, title, link, description, image_url, event_date, event_location
         FROM events
         WHERE approved = 0
     """)
@@ -31,7 +32,9 @@ def home(request: Request):
             "title": row[1],
             "link": row[2],
             "description": row[3],
-            "image_url": row[4]
+            "image_url": row[4],
+            "event_date": row[5],
+            "event_location": row[6]
         })
 
     return templates.TemplateResponse(
@@ -43,6 +46,7 @@ def home(request: Request):
     )
 
 
+# API endpoint returning all events as JSON
 @app.get("/events")
 def get_events():
     connection = sqlite3.connect("finbiz.db")
@@ -66,6 +70,8 @@ def get_events():
 
     return events
 
+
+# Mark an event as approved and remove it from the pending queue
 @app.post("/events/{event_id}/approve")
 def approve_event(event_id: int):
     connection = sqlite3.connect("finbiz.db")
@@ -81,6 +87,8 @@ def approve_event(event_id: int):
 
     return RedirectResponse(url="/", status_code=303)
 
+
+# API endpoint returning only approved events
 @app.get("/approved-events")
 def approved_events():
     connection = sqlite3.connect("finbiz.db")
@@ -106,6 +114,8 @@ def approved_events():
         for row in rows
     ]
 
+
+# Display approved events dashboard
 @app.get("/approved")
 def approved_page(request: Request):
 
@@ -143,6 +153,7 @@ def approved_page(request: Request):
 
 from backend.post_generator import generate_post
 
+# Generate a preview for a single event
 @app.get("/events/{event_id}/preview")
 def preview_event(request: Request, event_id: int):
 
@@ -150,7 +161,7 @@ def preview_event(request: Request, event_id: int):
     cursor = connection.cursor()
 
     cursor.execute("""
-        SELECT title, description, link
+        SELECT title, description, link, event_date, event_location
         FROM events
         WHERE id = ?
     """, (event_id,))
@@ -165,7 +176,9 @@ def preview_event(request: Request, event_id: int):
     post = generate_post(
         row[0],
         row[1],
-        row[2]
+        row[2],
+        row[3],
+        row[4]
     )
 
     return templates.TemplateResponse(
